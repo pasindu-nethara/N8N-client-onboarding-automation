@@ -1,0 +1,712 @@
+{
+  "name": "Client Onboarding Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "formId": "nLI7roGZ"
+      },
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -208,
+        368
+      ],
+      "id": "41897f82-7b70-4b72-ab12-507ac448bc81",
+      "name": "Typeform Trigger",
+      "webhookId": "6362bb41-c534-473c-9672-5993507d2435",
+      "credentials": {
+        "typeformApi": {
+          "id": "RkGDZ3HR2r8fqXXC",
+          "name": "Typeform account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "21f4587b-8dcb-42be-a867-84bbf7c2e8d6",
+              "name": "Name",
+              "value": "={{ $json[\"What is your name?\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "a9c95cb8-d54d-4f0b-b163-a46b36356617",
+              "name": "Company",
+              "value": "={{ $json[\"What is your company?\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "4bdaf84c-9121-47c9-b427-23d96840a096",
+              "name": "Services",
+              "value": "={{ $json[\"What are the service you purchased?\"] }}",
+              "type": "array"
+            },
+            {
+              "id": "c4219233-307f-4f9d-80d5-126863d6d4a7",
+              "name": "Email",
+              "value": "={{ $json[\"What is your email?\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        368
+      ],
+      "id": "2ed9fe75-f895-4396-8f87-e13a5ba0c123",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "34dd638b-a229-8090-9a85-e0f756370322",
+          "mode": "list",
+          "cachedResultName": "Client Onboarding Automation",
+          "cachedResultUrl": "https://www.notion.so/34dd638ba22980909a85e0f756370322"
+        },
+        "title": "={{ $json.Name }} ",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Client Name|rich_text",
+              "textContent": "={{ $json.Name }}"
+            },
+            {
+              "key": "Company|rich_text",
+              "textContent": "={{ $json.Company }}"
+            },
+            {
+              "key": "Email|email",
+              "emailValue": "={{ $json.Email }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_2",
+              "textContent": "Services"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        48
+      ],
+      "id": "fbd7f459-b6d0-49e7-8410-7df06abcb8f3",
+      "name": "Create a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "4TzOfHMfLpT8vyBu",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "Services",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        320,
+        256
+      ],
+      "id": "b9921efb-cc02-4cf2-b7a1-fe899a4e8ace",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $json.url }}",
+          "mode": "url"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "to_do",
+              "textContent": "={{ $json.Services }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        704,
+        256
+      ],
+      "id": "495de30c-1b0d-4a42-a335-58b3942ea193",
+      "name": "Append a block",
+      "credentials": {
+        "notionApi": {
+          "id": "4TzOfHMfLpT8vyBu",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.url = $(\"Create a database page\").first().json.url;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        256
+      ],
+      "id": "672c4831-c7ea-4892-8875-eb6cff1be8c0",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=BrightFlow — {{ $json.Name }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "root",
+          "mode": "list",
+          "cachedResultName": "/ (Root folder)",
+          "cachedResultUrl": "https://drive.google.com/drive"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        288,
+        448
+      ],
+      "id": "78183ca4-3925-4339-8fb2-ba0ae6ed31be",
+      "name": "Create folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "sPBHMmTtf3QEmAh7",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json.folders }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').first().json.id}}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        864,
+        448
+      ],
+      "id": "d7fa15c6-113d-413f-941f-43b5dd2db123",
+      "name": "Create folder1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "sPBHMmTtf3QEmAh7",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"folders\" : [\"Briefs\", \"Deliverables\", \"Reports\"]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        448
+      ],
+      "id": "14a783c3-afe4-42bb-bb04-6187869b5d03",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "folders",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        688,
+        448
+      ],
+      "id": "ac0e2680-5846-45ad-a8ee-de2c988984db",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "channel",
+        "channelId": "={{ $json.newName }}-{{ $json.newCompany }}6",
+        "channelVisibility": "private"
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        560,
+        832
+      ],
+      "id": "b3dd4700-d22a-4c86-9350-fb31739a398a",
+      "name": "Create a channel",
+      "webhookId": "48b5e2e4-4503-4e9d-98a5-5547ff0c43d3",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "gJOg7D86HafAT2ik",
+          "name": "client"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const newName = $input.first().json.Name.toLowerCase().replace(/[^a-z0-9]/g, \"-\").replace(/-+/g, \"-\").replace(/^-|-$/g, \"\");\nconst newCompany = $input.first().json.Company.toLowerCase().replace(/[^a-z0-9]/g, \"-\").replace(/-+/g, \"-\").replace(/^-|-$/g, \"\")\n\n$input.first().json.newName = newName;\n$input.first().json.newCompany = newCompany;\n\nreturn $input.first().json;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        832
+      ],
+      "id": "5e3c846a-5947-4667-8b83-3b6b35acfb48",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "channel",
+        "operation": "invite",
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "userIds": [
+          "U0A47VB7JM6"
+        ]
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        848,
+        720
+      ],
+      "id": "2bfd1e16-4e59-44a6-9e67-601d733ac431",
+      "name": "Invite a user to a channel",
+      "webhookId": "3101dd01-1e6a-46e1-ae02-2c1b4585b6bd",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "gJOg7D86HafAT2ik",
+          "name": "client"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        480,
+        640
+      ],
+      "id": "7dcd7608-2b65-40c0-b8da-c3e7ff3c63df",
+      "name": "Merge"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        848,
+        960
+      ],
+      "id": "687bd8df-9e96-412b-983a-a5b7e1e4825b",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $('Create a channel').first().json.id }}",
+          "mode": "id"
+        },
+        "text": "=New client onboarded!\nProject page: {{ $('Create a database page').first().json.url }}\nDrive folder: https://drive.google.com/drive/folders/{{ $('Create folder').first().json.id }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1392,
+        848
+      ],
+      "id": "08ec3bca-7f2a-41a2-84fd-822f44c786c7",
+      "name": "Send a message",
+      "webhookId": "1552cfe2-97e5-4fc9-93f0-741492288fc3",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "gJOg7D86HafAT2ik",
+          "name": "client"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a welcome email to our new client using the information below.\n\nClient Details:\n\nClient Name: {{ $('Edit Fields').item.json.Name }}\nCompany: {{ $('Edit Fields').item.json.Company }}\n\nServices Purchased: {{ $('Edit Fields').item.json.Services }}\n\nWorkspace Links to Include:\n\nClient Portal (Notion): {{ $('Create a database page').item.json.url }}\n\nShared Assets Folder (Google Drive): https://drive.google.com/drive/folders/{{ $('Create folder').first().json.id }}\n\nCommunication Channel (Slack): https://slack.com/app_redirect?channel={{ $('Create a channel').first().json.id }}\n\nKickoff Call (Calendly): https://calendly.com/pasindunethara2018/30min\n\nEmail Structure Requirements:\n\nSubject Line: Create a clear, exciting subject line including the client's company name.\n\nIntroduction: A warm welcome expressing our excitement to partner with them and build out their backend and automation systems.\n\nThe Setup: Briefly explain that their entire workspace has been automatically generated.\n\nThe Links: Present the Notion, Drive, and Slack links using clean bullet points. Explain what each link is for in one short sentence.\n\nCall to Action: Direct them to book their kickoff call using the Calendly link as their only immediate task.\n\nSign-off: Professional closing from \"The Automation Team\".",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are the lead project manager at a premium AI Workflow Automation Agency. Your goal is to write a warm, professional, and highly structured onboarding email to a new client. You must write in clear, flawless English. Keep the tone confident, reassuring, and forward-moving. Do not use overly flowery language; focus on clarity and next steps."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1376,
+        1056
+      ],
+      "id": "d1a754d3-9df8-425f-b8d4-6f19426f4ddf",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        1280
+      ],
+      "id": "8ec41f83-d9f3-404a-b772-7dc842605144",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ntzJjlEDwPiFjTvj",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        960
+      ],
+      "id": "a6eab607-d3c9-433a-bbfc-9dfc4584cdcc",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields').first().json.Email }}",
+        "subject": "={{ $json.output.subject }}",
+        "message": "={{ $json.output.email_body_html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1712,
+        1056
+      ],
+      "id": "300c8a89-1f54-42e5-9cbd-b4985ef93d69",
+      "name": "Send a message1",
+      "webhookId": "babc5268-0b6f-4d4c-80ea-9c1250ec38d0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "yYQNrqba63KyoJA8",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"subject\": {\n      \"type\": \"string\",\n      \"description\": \"A clear, exciting email subject line including the client's company name. Do not include the word 'Subject:'.\"\n    },\n    \"email_body_html\": {\n      \"type\": \"string\",\n      \"description\": \"The complete email body formatted in pure HTML with beautiful, professional inline CSS styling. It MUST follow this exact structure: 1. Introduction, 2. The Setup, 3. The Links, 4. Call to Action, 5. Sign-off. DESIGN INSTRUCTIONS: Use a modern corporate color palette (e.g., navy blue headers, dark slate text, and a soft background color for the unordered list area). Use clean sans-serif fonts (Arial, Helvetica, sans-serif). Style the Call to Action (Calendly link) as a prominent, colourful, rounded HTML button using inline CSS (e.g., background-color, padding, border-radius, text-decoration: none). Ensure the layout has good padding and spacing for a premium feel.\"\n    }\n  },\n  \"required\": [\n    \"subject\",\n    \"email_body_html\"\n  ],\n  \"additionalProperties\": false\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1600,
+        1280
+      ],
+      "id": "b39fbc2a-ba5e-4bec-a14f-715b5d13f930",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Typeform Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create folder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a database page": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append a block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Create folder1": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Create folder1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a channel": {
+      "main": [
+        [
+          {
+            "node": "Invite a user to a channel",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Create a channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invite a user to a channel": {
+      "main": [
+        []
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "828e57da-5a4a-446f-8ee9-7ebf728673d7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ca7587fd9b3c6a0e579717b71fb73701e8ec9ea04060ff7b07bad8e51e5bf"
+  },
+  "id": "SUxf8vBIDR6LPPjM",
+  "tags": []
+}
