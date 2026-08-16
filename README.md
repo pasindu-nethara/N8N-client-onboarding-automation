@@ -13,7 +13,7 @@ n8n workflow that automates client onboarding after a Typeform submission.
 7. Sends the welcome email to the client via Gmail.
 ## Workflow Diagram
  
-![Workflow](WhatsApp_Image_2026-08-16_at_18_00_27.jpeg)
+![Workflow]()
  
 ## Nodes Used
  
